@@ -19,16 +19,24 @@ class BufferPostingController extends Controller
     public function index()
     {
         $user = User::find(Auth::id());
-//        $bufferPostings = BufferPosting::take(10)->get();
         $bufferPostings = BufferPosting::paginate(10);
         $socialPostGroups = SocialPostGroups::where('user_id', Auth::id())->select('type')->distinct('type')->get();
 //        var_dump($bufferPosting);
         return View::make('pages.buffer-posting', compact('user', 'bufferPostings', 'socialPostGroups'));
     }
 
-    public function search()
+    public function search(Request $request)
     {
-        return redirect(url('buffer-postings'));
+        $user = User::find(Auth::id());
+        if(isset($request->date))
+        {
+            $bufferPostings = BufferPosting::whereDate('created_at', '=', date('Y-m-d', strtotime($request->date)))->paginate(10);
+        }
+        else{
+            $bufferPostings = BufferPosting::paginate(10);
+        }
+        $socialPostGroups = SocialPostGroups::where('user_id', Auth::id())->select('type')->distinct('type')->get();
+        return View::make('pages.buffer-posting', compact('user', 'bufferPostings', 'socialPostGroups'));
     }
 
     /**
